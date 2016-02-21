@@ -20,8 +20,8 @@
   },
   "autoload": {
     "psr-0": {
-      "dgild\\MultiConnector\\": "src/"
+      "Dgild\\MultiConnector\\": "src/"
     }
   },
-  "minimum-stability": "alpha"
+  "minimum-stability": "beta"
 }
