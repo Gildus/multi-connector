@@ -1,0 +1,27 @@
+{
+  "name": "dgild/multi-connector",
+  "description": "Authentication with DB and LDAP in Laravel",
+  "homepage": "https://github.com/Gildus/multi-connector",
+  "keywords": ["Laravel", "Ldap", "authentication", "php", "database", "login"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Gildus",
+      "email": "gildus@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.0",
+    "laravel/framework": "~5.0",
+    "adldap2/adldap2": "^4.0"
+  },
+  "require-dev": {
+    "phpspec/phpspec": "^2.2"
+  },
+  "autoload": {
+    "psr-0": {
+      "dgild\\MultiConnector\\": "src/"
+    }
+  },
+  "minimum-stability": "alpha"
+}

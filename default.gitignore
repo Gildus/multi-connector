@@ -1,0 +1,15 @@
+.idea/
+*.iml
+/out/
+*.ipr
+*.iws
+.idea_modules/
+nbproject/
+*.sublime-workspace
+.project
+
+composer.phar
+/vendor/
+composer.lock
+
+
