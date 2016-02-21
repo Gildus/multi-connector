@@ -3,7 +3,7 @@
 namespace Dgild\MultiConnector\Adapter;
 
 use adLDAP\adLDAP as adLDAPService;
-use adLDAP\collections\adLDAPUserCollection as adLDAPUserCollection;
+use Dgild\MultiConnector\Adapter\adLDAPUserCollection as adLDAPUserCollection;
 use Dgild\MultiConnector\Model\User as UserModel;
 
 class Adldap implements LdapInterface

@@ -10,10 +10,16 @@
       "email": "gildus@gmail.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/Gildus/adLDAP"
+    }
+  ],
   "require": {
     "php": ">=5.5.0",
     "laravel/framework": "~5.0",
-    "adldap2/adldap2": "^4.0"
+    "adldap/adldap": "dev-master"
   },
   "require-dev": {
     "phpspec/phpspec": "^2.2"
