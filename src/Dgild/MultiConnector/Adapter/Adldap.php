@@ -2,7 +2,7 @@
 
 namespace Dgild\MultiConnector\Adapter;
 
-use adLDAP\adLDAP as adLDAPService;
+use Adldap\Adldap as adLDAPService;
 use Dgild\MultiConnector\Adapter\adLDAPUserCollection as adLDAPUserCollection;
 use Dgild\MultiConnector\Model\User as UserModel;
 
@@ -65,6 +65,8 @@ class Adldap implements LdapInterface
      */
     public function getUserInfo($username)
     {
+        $a =  $this->_ldap->users()->all();
+        var_dump($a); exit;
         $user = $this->_ldap->user()->infoCollection($username, ['samaccountname', 'givenname', 'sn', 'mail']);
 
         if (!$user) {

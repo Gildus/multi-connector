@@ -2,36 +2,13 @@
 
 namespace Dgild\MultiConnector;
 
-use Auth;
-use Dgild\MultiConnector\Adapter\Adldap;
-use Illuminate\Auth\Guard;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+
 
 class MultiConnectorServiceProvider extends ServiceProvider
 {
-    /**
-     * Indicates if loading of the provider is deferred.
-     *
-     * @var bool
-     */
-    protected $defer = false;
-
-    /**
-     * Bootstrap the application events.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        Auth::extend('ldap', function($app) {
-            $ldap = new Adldap(
-                $this->getLdapAdapterConfig('adldap')
-            );
-            $provider = new LdapUserProvider($ldap);
-
-            return new Guard($provider, $app['session.store']);
-        });
-    }
 
     /**
      * Register the service provider.
@@ -40,46 +17,70 @@ class MultiConnectorServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $ldapConfig = __DIR__ . '/Config/ldap.php';
-        $this->publishConfig($ldapConfig);
+        $this->registerAuthenticator();
+        $this->registerUserResolver();
+        $this->registerAccessGate();
+        $this->registerRequestRebindHandler();
     }
 
     /**
-     * Get the services provided by the provider.
+     * Register the authenticator services.
      *
-     * @return array
+     * @return void
      */
-    public function provides()
+    protected function registerAuthenticator()
     {
-        return ['auth'];
-    }
+        $this->app->singleton('auth', function ($app) {
+            // Once the authentication service has actually been requested by the developer
+            // we will set a variable in the application indicating such. This helps us
+            // know that we need to set any queued cookies in the after event later.
+            $app['auth.loaded'] = true;
 
-    protected function publishConfig($configPath)
-    {
-        $this->publishes([
-            $configPath => config_path('ldap.php'),
-        ]);
-    }
+            return new AuthManager($app);
+        });
 
-    /**
-     * Get ldap configuration.
-     *
-     * @return array
-     */
-    public function getLdapConfig()
-    {
-        return $this->app['config']->get('ldap');
+        $this->app->singleton('auth.driver', function ($app) {
+            return $app['auth']->driver();
+        });
     }
 
     /**
-     * @param $pluginName
+     * Register a resolver for the authenticated user.
      *
-     * @return array
+     * @return void
      */
-    public function getLdapAdapterConfig($pluginName)
+    protected function registerUserResolver()
     {
-        $pluginsConfig = $this->app['config']->get('ldap.plugins');
+        $this->app->bind('Illuminate\Contracts\Auth\Authenticatable', function ($app) {
+            return $app['auth']->user();
+        });
+    }
 
-        return $pluginsConfig[$pluginName];
+    /**
+     * Register the access gate service.
+     *
+     * @return void
+     */
+    protected function registerAccessGate()
+    {
+        $this->app->singleton(GateContract::class, function ($app) {
+            return new Gate($app, function () use ($app) {
+                return $app['auth']->user();
+            });
+        });
+    }
+
+    /**
+     * Register a resolver for the authenticated user.
+     *
+     * @return void
+     */
+    protected function registerRequestRebindHandler()
+    {
+        $this->app->rebinding('request', function ($app, $request) {
+            $request->setUserResolver(function () use ($app) {
+                return $app['auth']->user();
+            });
+        });
     }
 }
