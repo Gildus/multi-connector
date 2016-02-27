@@ -1,7 +1,7 @@
 # MultiConnector
 
 It uses ADLDAP 5.0 library forked on Adldap2 (https://github.com/Adldap2/Adldap2) to create a bridge between Laravel and LDAP
-> Originally written by SaschaDens. Adopted by the community.
+> Originally written by Sarav. Adopted by the community.
 
 ## Installation
 1. Install this package through Composer for Laravel v5.1:
@@ -12,8 +12,13 @@ It uses ADLDAP 5.0 library forked on Adldap2 (https://github.com/Adldap2/Adldap2
 1. Add the service provider in the app configuration by opening `config/app.php`, and add a new item to the providers array.
 
        ```
-       Dgild\MultiConnector\MultiConnectorServiceProvider::class
+       Dgild\MultiConnector\MultiConnectorServiceProvider::class     
        ```
+   Them you need to comment the line:
+      ```
+      Illuminate\Auth\AuthServiceProvider::class
+      ```
+   
 1. Change the authentication driver in the Laravel config to use the ldap driver. You can find this in the following file `config/auth.php`
 
     ```php
@@ -61,6 +66,14 @@ It uses ADLDAP 5.0 library forked on Adldap2 (https://github.com/Adldap2/Adldap2
 ## Usage
 The LDAP plugin is an extension of the Auth class and will act the same as normal usage with Eloquent driver.
 
+For example if you need to login with Eloquent:
+```
+\Auth::attempt('db', $credentials, $request->has('remember'));
+```
+Or if you need to login with Ldap:
+```
+\Auth::attempt('ldap', $credentials, $request->has('remember'));
+```
 
 Laravel documentation: [Authentication Quickstart](http://laravel.com/docs/master/authentication#authentication-quickstart)
 
