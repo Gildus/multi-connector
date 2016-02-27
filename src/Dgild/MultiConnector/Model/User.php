@@ -147,4 +147,12 @@ class User implements Authenticatable
     {
         return $this->_user['email'];
     }
+
+    public function getAuthDetail()
+    {
+        return [
+            'displayname' => $this->getFirstname(),
+            'mail' => $this->getEmail()
+        ];
+    }
 }
