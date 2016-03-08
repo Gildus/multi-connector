@@ -75,5 +75,60 @@ Or if you need to login with Ldap:
 \Auth::attempt('ldap', $credentials, $request->has('remember'));
 ```
 
+From the controller AuthController.php: https://github.com/laravel/laravel/blob/master/app/Http/Controllers/Auth/AuthController.php
+for example if you need to use the connection with db like these:
+
+```
+public function postLogin(Request $request)
+{
+    
+    $this->validate($request, [
+        'username' => 'required', 
+        'password' => 'required',
+    ]);
+
+    // If the class is using the ThrottlesLogins trait, we can automatically throttle
+    // the login attempts for this application. We'll key this by the username and
+    // the IP address of the client making these requests into this application.
+    
+    $throttles = $this->isUsingThrottlesLoginsTrait();
+    
+    if ($throttles && $this->hasTooManyLoginAttempts($request)) {            
+        return $this->sendLockoutResponse($request);
+    }
+
+    $credentials = $this->getCredentials($request);
+    $logged = \Auth::attempt('db', $credentials, $request->has('remember'));
+
+    if ($logged) {
+        return $this->handleUserWasAuthenticated($request, $throttles);
+    } 
+    
+    if ($throttles) {            
+        $this->incrementLoginAttempts($request);
+    }
+    
+    return view('auth.login')
+        ->with('input', $request->only('username', 'remember'))
+        ->withErrors(['username' => $this->getFailedLoginMessage()]);
+}
+
+
+protected function handleUserWasAuthenticated(Request $request, $throttles)
+{        
+    if ($throttles) {            
+        $this->clearLoginAttempts($request);
+    }
+    
+    if (method_exists($this, 'authenticated')) {            
+        return $this->authenticated($request, Auth::user($this->user));
+    }
+    
+    return redirect()->intended($this->redirectPath());
+}
+
+``` 
+    
+
 Laravel documentation: [Authentication Quickstart](http://laravel.com/docs/master/authentication#authentication-quickstart)
 
