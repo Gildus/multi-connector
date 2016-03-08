@@ -97,7 +97,7 @@ public function postLogin(Request $request)
         return $this->sendLockoutResponse($request);
     }
 
-    $credentials = $this->getCredentials($request);
+    $credentials = $request->only('username', 'password');
     $logged = \Auth::attempt('db', $credentials, $request->has('remember'));
 
     if ($logged) {
