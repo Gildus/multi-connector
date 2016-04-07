@@ -6,11 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
 trait AuthenticatesUsers
 {
 
-    use RedirectsUsers, ThrottlesLogins;
+    use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
     /**
      * Variable for type of connection DB or LDAP
@@ -114,27 +115,6 @@ trait AuthenticatesUsers
         } else {
             return $this->logginLdap($credentials, $request, $throttles);
         }
-
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
-        if ($throttles) {
-            $this->incrementLoginAttempts($request);
-        }
-
-        if ($redirectUrl = $this->loginPath()) {
-            return redirect($redirectUrl)
-                ->withInput($request->only($this->loginUsername(), 'remember'))
-                ->withErrors([
-                    $this->loginUsername() => $this->getFailedLoginMessage(),
-                ]);
-        } else {
-            return back()
-                ->withInput($request->only($this->loginUsername(), 'remember'))
-                ->withErrors([
-                    $this->loginUsername() => $this->getFailedLoginMessage(),
-                ]);
-        }
     }
 
     /**
@@ -209,7 +189,7 @@ trait AuthenticatesUsers
      */
     public function loginUsername()
     {
-        return property_exists($this, 'username') ? $this->username : 'email';
+        return isset($this->username) ? $this->username : 'email';
     }
 
     /**
@@ -311,28 +291,30 @@ trait AuthenticatesUsers
      */
     private function saveUserForDatabase($credenciales)
     {
-        $detalles = Auth::user($this->user())->getAuthDetail();
         $name = Auth::user($this->user())->getAuthIdentifier();
+        $password = \bcrypt($credenciales['password']);
+        $firstName = Auth::user($this->user())->getFirstname();
+        $email = Auth::user($this->user())->getEmail();
 
         /// If the user exists in the BD before to register
         $userLdap = User::where('username', '=', $name)
-            ->orWhere('email', $detalles['mail'])
+            ->orWhere('email', $email)
             ->get()
             ->first();
-        $name = explode(' ',$detalles['displayname']);
+
         if (!$userLdap) {
             /// Make insert into BD:
             $userLdap = User::create([
-                'name' => $name[0],
-                'first_name' => $detalles['displayname'],
+                'name' => $firstName,
                 'username' => $name,
-                'email' => $detalles['mail'],
-                'password' => \bcrypt($credenciales['password']),
+                'email' => $email,
+                'password' => $password,
             ]);
         } else {
-            $userLdap->name = $name[0];
-            $userLdap->first_name = $detalles['displayname'];
-            $userLdap->password = \bcrypt($credenciales['password']);
+            $userLdap->name = $firstName;
+            $userLdap->username = $name;
+            $userLdap->email = $email;
+            $userLdap->password = $password;
             $userLdap->save();
         }
 

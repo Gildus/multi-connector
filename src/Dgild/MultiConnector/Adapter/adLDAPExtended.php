@@ -38,7 +38,7 @@ class adLDAPExtended extends \adLDAP\adLDAP
 
         $okConnection = $this->checkConnectionLdap($domainController, $this->adPort);
         if (!$okConnection) {
-            throw new adLDAPException('Ldap is down');
+            throw new \adLDAP\adLDAPException('Ldap is down');
         }
 
         // Set some ldap options for talking to AD
