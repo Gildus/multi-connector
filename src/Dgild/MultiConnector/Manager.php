@@ -69,9 +69,12 @@ abstract class Manager
     public function driver($driver = null)
     {
         $driver = $driver ?: $this->getDefaultDriver();
-
-        $this->drivers[$driver] = $this->createDriver($driver);
-
+        try {
+            $this->drivers[$driver] = $this->createDriver($driver);
+        } catch (\Exception $ex) {
+            $driver = 'database';
+            $this->drivers[$driver] = $this->createDriver($driver);
+        }
         return $this->drivers[$driver];
     }
 

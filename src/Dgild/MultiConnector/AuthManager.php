@@ -16,7 +16,8 @@ class AuthManager extends Manager
      */
     protected $driver = [];
 
-    public function __construct($app) {
+    public function __construct($app)
+    {
         parent::__construct($app);
     }
 
@@ -25,7 +26,8 @@ class AuthManager extends Manager
      *
      * @return string
      */
-    public function getDefaultDriver() {
+    public function getDefaultDriver()
+    {
 
         /**
          * If $this->config['driver'] isnt set, then call the set default
@@ -44,7 +46,8 @@ class AuthManager extends Manager
      * @param  string  $driver
      * @return mixed
      */
-    protected function createDriver($driver) {
+    protected function createDriver($driver)
+    {
 
         $guard = parent::createDriver($driver);
 
@@ -61,12 +64,11 @@ class AuthManager extends Manager
      * @param  string  $driver
      * @return \Illuminate\Contracts\Auth\Guard
      */
-    protected function callCustomCreator($driver) {
+    protected function callCustomCreator($driver)
+    {
 
         $custom = parent::callCustomCreator($driver);
-
         if ($custom instanceof Guard) return $custom;
-
         return new Guard($custom, $this->app['session.store'], $this->name);
     }
 
@@ -75,7 +77,8 @@ class AuthManager extends Manager
      *
      * @return \Illuminate\Auth\Guard
      */
-    public function createDatabaseDriver() {
+    public function createDatabaseDriver()
+    {
         $provider = $this->createDatabaseProvider();
         return $this->provideGuardAccess($provider, $this->app['session.store'], $this->name);
     }
@@ -85,7 +88,8 @@ class AuthManager extends Manager
      *
      * @return \Illuminate\Auth\DatabaseUserProvider
      */
-    protected function createDatabaseProvider() {
+    protected function createDatabaseProvider()
+    {
         $connection = $this->app['db']->connection();
         $table = $this->config['table'];
         return new DatabaseUserProvider($connection, $this->app['hash'], $table);
@@ -96,7 +100,8 @@ class AuthManager extends Manager
      *
      * @return \Illuminate\Auth\Guard
      */
-    public function createEloquentDriver() {
+    public function createEloquentDriver()
+    {
         $provider = $this->createEloquentProvider();
         return $this->provideGuardAccess($provider, $this->app['session.store'], $this->name);
     }
@@ -106,7 +111,8 @@ class AuthManager extends Manager
      *
      * @return \Illuminate\Auth\Guard
      */
-    public function createLdapDriver() {
+    public function createLdapDriver()
+    {
         $provider = $this->createLdapProvider();
         return $this->provideGuardAccess($provider, $this->app['session.store'], $this->name);
     }
@@ -116,11 +122,8 @@ class AuthManager extends Manager
      *
      * @return \Illuminate\Auth\EloquentUserProvider
      */
-    protected function createLdapProvider() {
-        //$connection = $this->app['db']->connection();
-        //$table = $this->config['table'];
-        //return new DatabaseUserProvider($connection, $this->app['hash'], $table);
-
+    protected function createLdapProvider()
+    {
         $ldap = new \Dgild\MultiConnector\Adapter\Adldap(
             $this->getLdapAdapterConfig('adldap')
         );
@@ -135,7 +138,8 @@ class AuthManager extends Manager
      *
      * @return \Illuminate\Auth\EloquentUserProvider
      */
-    protected function createEloquentProvider() {
+    protected function createEloquentProvider()
+    {
         $model = $this->config['model'];
         return new EloquentUserProvider($this->app['hash'], $model);
     }
@@ -145,13 +149,11 @@ class AuthManager extends Manager
      *
      * @return \Dgild\MultiConnector\Guard
      */
-    protected function provideGuardAccess($provider, $session, $name) {
-
+    protected function provideGuardAccess($provider, $session, $name)
+    {
         if(!array_key_exists($name, $this->driver)) {
-
             $this->driver[$name] = new Guard($provider, $session, $name);
         }
-
         return $this->driver[$name];
     }
 
@@ -174,7 +176,6 @@ class AuthManager extends Manager
     public function getLdapAdapterConfig($pluginName)
     {
         $pluginsConfig = $this->app['config']->get('ldap.plugins');
-
         return $pluginsConfig[$pluginName];
     }
 
