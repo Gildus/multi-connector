@@ -71,7 +71,7 @@ abstract class Manager
         $driver = $driver ?: $this->getDefaultDriver();
         try {
             $this->drivers[$driver] = $this->createDriver($driver);
-        } catch (\Exception $ex) {
+        } catch (\adLDAP\adLDAPException $ex) {
             $driver = 'database';
             $this->drivers[$driver] = $this->createDriver($driver);
         }
