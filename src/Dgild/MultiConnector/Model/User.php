@@ -155,4 +155,25 @@ class User implements Authenticatable
             'mail' => $this->getEmail()
         ];
     }
+
+    public function __get($name)
+    {
+        return $this->_user[$name] ? $this->_user[$name] : null;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->_user[$name] = $value;
+    }
+
+    /**
+     * Get the name of the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return $this->getFirstname();
+    }
+
 }
