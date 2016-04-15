@@ -158,7 +158,7 @@ class User implements Authenticatable
 
     public function __get($name)
     {
-        return $this->_user[$name] ? $this->_user[$name] : null;
+        return isset($this->_user[$name]) ? $this->_user[$name] : null;
     }
 
     public function __set($name, $value)
