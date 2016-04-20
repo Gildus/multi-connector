@@ -69,12 +69,7 @@ abstract class Manager
     public function driver($driver = null)
     {
         $driver = $driver ?: $this->getDefaultDriver();
-        try {
-            $this->drivers[$driver] = $this->createDriver($driver);
-        } catch (\adLDAP\adLDAPException $ex) {
-            $driver = 'database';
-            $this->drivers[$driver] = $this->createDriver($driver);
-        }
+        $this->drivers[$driver] = $this->createDriver($driver);
         return $this->drivers[$driver];
     }
 
@@ -205,10 +200,9 @@ abstract class Manager
      *
      * @param array $config
      */
-    public function setDefaultConfig($config = []) {
-
+    public function setDefaultConfig($config = [])
+    {
         if( !count($config) ) $config = $this->app['config']['auth.multi'];
-
         $default = $this->app['config']['auth.default'];
 
         if (!$default) {
